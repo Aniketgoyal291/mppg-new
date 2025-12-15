@@ -15,6 +15,13 @@ from pdf2image.exceptions import PDFPageCountError
 import uuid
 import numpy as np
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, will use system environment variables
+
 # Try to import pytesseract, but make it optional
 try:
     import pytesseract
@@ -432,10 +439,7 @@ NOW ANALYZE THIS CYLINDER DRAWING AND EXTRACT ONLY THE 12 PARAMETERS LISTED ABOV
 
     API_URL = "https://api.openai.com/v1/chat/completions"
     API_KEY = os.getenv("OPENAI_API_KEY")
-    
-    # Strip any whitespace and quotes that might be added by hosting platform
-    if API_KEY:
-        API_KEY = API_KEY.strip().strip('"').strip("'")
+    print(f"[API Key]: {API_KEY}")
 
     payload = {
         "model": "gpt-5.2", 
@@ -492,7 +496,7 @@ NOW ANALYZE THIS CYLINDER DRAWING AND EXTRACT ONLY THE 12 PARAMETERS LISTED ABOV
                                 value = value.replace('[', '').replace(']', '').strip()
                                 
                                 # Special handling for specific parameters
-                                if key in ["BORE DIAMETER", "OUTSIDE DIAMETER"]:
+                                if key in ["BORE DIAMETER"]:
                                     # Only accept if it's clearly from a table/label specification
                                     if any(indicator in content.lower() for indicator in ["table", "specification", "spec", "labeled", "marked"]):
                                         if key in parameters:
@@ -511,7 +515,7 @@ NOW ANALYZE THIS CYLINDER DRAWING AND EXTRACT ONLY THE 12 PARAMETERS LISTED ABOV
 
         # Enhanced validation with focused re-extraction for critical missing parameters
         critical_missing = []
-        for param in ["BORE DIAMETER", "OUTSIDE DIAMETER", "FLUID", "MOUNTING"]:
+        for param in ["BORE DIAMETER", "FLUID", "MOUNTING"]:
             if parameters.get(param, "NA") == "NA":
                 critical_missing.append(param)
 
@@ -558,22 +562,6 @@ Search locations:
 1. Specification table with parameter names
 2. Technical data box
 3. Explicit text labels with "BORE" keyword
-
-Output: [number only] or "NA"
-""",
-        "OUTSIDE DIAMETER": """
-ULTRA-FOCUSED TASK: Find OUTSIDE DIAMETER from specification table or explicit label ONLY.
-
-STRICT RULES:
-- ONLY extract if you see "OD:", "OUTSIDE DIA:", "OUTSIDE DIAMETER:", "EXTERNAL DIA:" in a table or label
-- DO NOT calculate from dimension lines or visual measurement  
-- Look specifically in specification tables or technical data boxes
-- If not explicitly labeled in text, return "NA"
-
-Search locations:
-1. Specification table with parameter names
-2. Technical data box
-3. Explicit text labels with "OUTSIDE" or "OD" keyword
 
 Output: [number only] or "NA"
 """,
@@ -812,7 +800,6 @@ def main():
                     parameter_list = [
                         "CYLINDER ACTION",
                         "BORE DIAMETER",
-                        "OUTSIDE DIAMETER",
                         "ROD DIAMETER",
                         "STROKE LENGTH",
                         "CLOSE LENGTH",

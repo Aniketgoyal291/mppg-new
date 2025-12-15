@@ -15,6 +15,13 @@ from pdf2image.exceptions import PDFPageCountError
 import uuid
 import numpy as np
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, will use system environment variables
+
 # Try to import pytesseract, but make it optional
 try:
     import pytesseract
