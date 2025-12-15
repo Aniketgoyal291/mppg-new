@@ -432,6 +432,10 @@ NOW ANALYZE THIS CYLINDER DRAWING AND EXTRACT ONLY THE 12 PARAMETERS LISTED ABOV
 
     API_URL = "https://api.openai.com/v1/chat/completions"
     API_KEY = os.getenv("OPENAI_API_KEY")
+    
+    # Strip any whitespace and quotes that might be added by hosting platform
+    if API_KEY:
+        API_KEY = API_KEY.strip().strip('"').strip("'")
 
     payload = {
         "model": "gpt-5.2", 
