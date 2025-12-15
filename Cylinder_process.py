@@ -474,11 +474,11 @@ NOW ANALYZE THIS CYLINDER DRAWING AND EXTRACT ONLY THE 12 PARAMETERS LISTED ABOV
             print("HTTP", response.status_code)
             print("HEADERS", response.headers)
             print("BODY", response.text)
-            st.write("[OpenAI API Main Response]", response)
+            # st.write("[OpenAI API Main Response]", response)
             print("[OpenAI API Main Response]", response)
             if response.status_code == 200:
                 response_json = response.json()
-                st.write("[OpenAI API Main Response]", response_json)
+                # st.write("[OpenAI API Main Response]", response_json)
                 print("[OpenAI API Main Response]", response_json)
                 if "choices" in response_json:
                     content = response_json["choices"][0]["message"]["content"]
